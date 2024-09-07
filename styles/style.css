@@ -4,7 +4,7 @@ body {font-family: Arial, sans-serif;
     background-image:url('photo/RobloxScreenShot20240905_223451164.png'); /* 壁紙 */
     background-size: cover;
     color: #ffffff;
-    height: 100vh; /* 使body充滿整個視口 */
+    min-height: 100vh; /* 使body充滿整個視口 */
     overflow: hidden; /* 隱藏滾動條 */
     background-position: center; /* 在中心對齊 */
     background-repeat: no-repeat; /* 不重複圖片 */
@@ -43,7 +43,6 @@ body {font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
     margin: 20px; /* 調整主內容區域的外邊距 */
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
@@ -110,4 +109,14 @@ h2 {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     width: 300px;
     text-align: center;
+}
+.footer {
+    position: fixed; /* 固定在頁面底部 */
+    bottom: 0; /* 距離底部 0 像素 */
+    left: 0; /* 距離左邊 0 像素 */
+    right: 0; /* 距離右邊 0 像素 */
+    background-color: rgba(0, 0, 0, 0.342); /* 背景顏色 */
+    color: white; /* 文字顏色 */
+    text-align: center; /* 文字居中 */
+    padding: 10px 0; /* 上下內邊距 */
 }
