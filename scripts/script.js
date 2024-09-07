@@ -40,7 +40,7 @@ function showError(error) {
 }
 
 function getCityName(latitude, longitude) {
-    const apiKey = 'e3c3e2d1964b4fd297dfd180cde9a6e3'; // 你的地理編碼API金鑰
+    const apiKey = 'e3c3e2d1964b4fd297dfd180cde9a6e3'; 
     const geoApiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}&language=en`;
 
     fetch(geoApiUrl)
@@ -53,10 +53,10 @@ function getCityName(latitude, longitude) {
         .then(data => {
             if (data.results.length > 0) {
                 const city = data.results[0].components.city || data.results[0].components.town;
-                const country = data.results[0].components.country; // 獲取國家名稱
+                const country = data.results[0].components.country;
                 document.getElementById('city').textContent = `你當前所在的城市是：${city}`;
-                document.getElementById('country').textContent = `國家：${country}`; // 顯示國家名稱
-                getWeather(city); // 使用獲取到的城市名稱
+                document.getElementById('country').textContent = `國家：${country}`; 
+                getWeather(city);
             } else {
                 document.getElementById('city').textContent = "未能找到城市名稱。";
             }
@@ -69,7 +69,7 @@ function getCityName(latitude, longitude) {
 
 // 獲取天氣資訊
 function getWeather(city) {
-    const apiKey = '8aedf7b3c49897fccbfced0645a4d57b'; // 你的天氣API金鑰
+    const apiKey = '8aedf7b3c49897fccbfced0645a4d57b';
     const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=8aedf7b3c49897fccbfced0645a4d57b&lang=zh_tw&units=metric`;
 
     fetch(weatherApiUrl)
@@ -92,16 +92,16 @@ function getWeather(city) {
 
 // Google 搜尋功能
 document.getElementById('search-input').addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') { // 檢查是否按下 Enter 鍵
+    if (event.key === 'Enter') { 
         const query = document.getElementById('search-input').value;
         if (query) {
             const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-            window.open(googleSearchUrl, '_blank'); // 在新窗口開啟搜尋結果
+            window.open(googleSearchUrl, '_blank'); 
         } else {
             alert('請輸入搜尋關鍵字');
         }
     }
 });
 
-// 開始獲取城市和國家資訊
+
 getLocation();
