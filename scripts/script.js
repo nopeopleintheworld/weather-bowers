@@ -98,7 +98,7 @@ document.getElementById('search-input').addEventListener('keydown', (event) => {
             const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
             window.open(googleSearchUrl, '_blank'); 
         } else {
-            alert('請輸入搜尋關鍵字');
+            alert('輸入搜尋');
         }
     }
 });
