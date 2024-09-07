@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>本地時間和天氣</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <style>
+        body{
+            background-image: url('photo/RobloxScreenShot20240905_223451164.png'); /* 壁紙 */
+            background-size: cover;
+            background-position: center; /* 在中心對齊 */
+            background-repeat: no-repeat; /* 不重複圖片 */
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="sidebar">
+            <img src="photo/home.png" alt="主頁" title="主頁" onclick="alert('主頁點擊!')" />
+            <img src="photo/wrench.png" alt="工具" title="工具" onclick="alert('工具點擊!')" />
+            <img src="photo/pen-tool.png" alt="設計" title="設計" onclick="alert('設計點擊!')" />
+            <img src="photo/programming-language.png" alt="程式" title="程式" onclick="alert('程式點擊!')" />
+            <img src="photo/info.png" alt="資料" title="資料" onclick="alert('資料點擊!')" />
+        </div>
+
+        <div id="main">
+            <div id="search">
+                <img src="photo/search.png" width="40px" height="40px">
+                <input type="text" id="search-input" placeholder="輸入搜尋關鍵字" />
+            </div>
+
+            <h1>當前本地時間</h1>
+            <h2 id="local-time"></h2>
+
+            <div id="weather">
+                <h2 id="city">正在獲取城市資訊...</h2>
+                <h3 id="country">正在獲取國家資訊...</h3>
+                <p id="weather-info">正在獲取天氣資訊...</p>
+            </div>
+
+            <div class="widget">
+                <h2>其他小工具</h2>
+                <p>這裡可以放置其他功能或小工具。</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/script.js"></script>
+</body>
+</html>
