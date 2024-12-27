@@ -28,7 +28,11 @@ function showError(error) {
             document.getElementById('city').textContent = "用戶拒絕了地理位置請求。";
             break;
         case error.POSITION_UNAVAILABLE:
+<<<<<<< HEAD
             document.getElementById('city').textContent = "位置資��不可用。";
+=======
+            document.getElementById('city').textContent = "位置資訊不可用。";
+>>>>>>> da32161d7169fd3214e1eb2f7da417228defb02e
             break;
         case error.TIMEOUT:
             document.getElementById('city').textContent = "請求位置超時。";
@@ -40,8 +44,13 @@ function showError(error) {
 }
 
 function getCityName(latitude, longitude) {
+<<<<<<< HEAD
     const apiKey = 'e3c3e2d1964b4fd297dfd180cde9a6e3';
     const geoApiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}&language=zh-TW`;
+=======
+    const apiKey = 'e3c3e2d1964b4fd297dfd180cde9a6e3'; 
+    const geoApiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}&language=en`;
+>>>>>>> da32161d7169fd3214e1eb2f7da417228defb02e
 
     fetch(geoApiUrl)
         .then(response => {
@@ -51,6 +60,7 @@ function getCityName(latitude, longitude) {
             return response.json();
         })
         .then(data => {
+<<<<<<< HEAD
             if (data.results && data.results.length > 0) {
                 const components = data.results[0].components;
                 // 嘗試不同的城市級別名稱
@@ -77,10 +87,26 @@ function getCityName(latitude, longitude) {
             console.error('Error fetching city name:', error);
             document.getElementById('city').textContent = "無法獲取城市資訊";
             document.getElementById('country').textContent = "";
+=======
+            if (data.results.length > 0) {
+                const city = data.results[0].components.city || data.results[0].components.town;
+                const country = data.results[0].components.country;
+                document.getElementById('city').textContent = `你當前所在的城市是：${city}`;
+                document.getElementById('country').textContent = `國家：${country}`; 
+                getWeather(city);
+            } else {
+                document.getElementById('city').textContent = "未能找到城市名稱。";
+            }
+        })
+        .catch(error => {
+            document.getElementById('city').textContent = "無法獲取城市資訊。";
+            console.error('Error fetching city name:', error);
+>>>>>>> da32161d7169fd3214e1eb2f7da417228defb02e
         });
 }
 
 // 獲取天氣資訊
+<<<<<<< HEAD
 async function getWeatherAndForecast(city) {
     const apiKey = '8aedf7b3c49897fccbfced0645a4d57b';
     const encodedCity = encodeURIComponent(city);
@@ -153,6 +179,28 @@ function updateForecast(data) {
         `;
         forecastDiv.innerHTML += dayHtml;
     });
+=======
+function getWeather(city) {
+    const apiKey = '8aedf7b3c49897fccbfced0645a4d57b';
+    const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=8aedf7b3c49897fccbfced0645a4d57b&lang=zh_tw&units=metric`;
+
+    fetch(weatherApiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('城市未找到');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const description = data.weather[0].description;
+            const temperature = data.main.temp;
+            document.getElementById('weather-info').textContent = `當前溫度: ${temperature} °C, 天氣: ${description}`;
+        })
+        .catch(error => {
+            document.getElementById('weather-info').textContent = '無法獲取天氣資訊';
+            console.error('Error fetching weather data:', error);
+        });
+>>>>>>> da32161d7169fd3214e1eb2f7da417228defb02e
 }
 
 // Google 搜尋功能
@@ -168,6 +216,7 @@ document.getElementById('search-input').addEventListener('keydown', (event) => {
     }
 });
 
+<<<<<<< HEAD
 function updateCountdown() {
     const now = new Date();
     const target = new Date('2025-01-01T00:00:00');
@@ -758,3 +807,7 @@ const sidebarStyles = `
 const sidebarStyleSheet = document.createElement('style');
 sidebarStyleSheet.textContent = sidebarStyles;
 document.head.appendChild(sidebarStyleSheet);
+=======
+
+getLocation();
+>>>>>>> da32161d7169fd3214e1eb2f7da417228defb02e
