@@ -1,55 +1,101 @@
 <!DOCTYPE html>
-<html lang="zh-tw">
+<html lang="zh-tw" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>本地時間和天氣</title>
     <link rel="stylesheet" href="styles/style.css">
-    <style>
-        body{
-            background-image: url('photo/RobloxScreenShot20240905_223451164.png'); 
-            background-size: cover;
-            background-position: center; 
-            background-repeat: no-repeat; 
-        }
-    </style>
 </head>
 <body>
-    <div id="container">
-        <div id="sidebar">
-            <img src="photo/home.png" alt="主頁" title="主頁" onclick="alert('主頁點擊!')" />
-            <img src="photo/wrench.png" alt="工具" title="工具" onclick="alert('工具點擊!')" />
-            <img src="photo/pen-tool.png" alt="設計" title="設計" onclick="alert('設計點擊!')" />
-            <img src="photo/programming-language.png" alt="程式" title="程式" onclick="alert('程式點擊!')" />
-            <img src="photo/info.png" alt="資料" title="資料" onclick="alert('資料點擊!')" />
-        </div>
+    <!-- 側邊欄 -->
+    <div id="sidebar">
+        <img src="photo/home.png" alt="主頁" title="主頁">
+        <img src="photo/wrench.png" alt="工具" title="工具">
+        <img src="photo/pen-tool.png" alt="設計" title="設計">
+        <img src="photo/programming-language.png" alt="程式" title="程式">
+        <img src="photo/info.png" alt="資訊" title="資訊">
+        <img src="photo/theme.png" alt="主題" title="切換主題" onclick="toggleTheme()">
+        <img src="photo/background.png" alt="背景" title="背景設置" onclick="openBackgroundSettings()">
+    </div>
 
-        <div id="main">
-            <div id="search">
-                <img src="photo/search.png" width="40px" height="40px">
-                <input type="text" id="search-input" placeholder="輸入搜尋" />
-            </div>
-
-            <h1>當前本地時間</h1>
-            <h2 id="local-time"></h2>
-
-            <div id="weather">
-                <h2 id="city">正在獲取城市資訊...</h2>
-                <h3 id="country">正在獲取國家資訊...</h3>
-                <p id="weather-info">正在獲取天氣資訊...</p>
-            </div>
-
-            <div class="widget">
-                <h2>其他小工具</h2>
-                <p>這裡可以放置其他功能或小工具。</p>
-            </div>
-            <div class="footer">
-                <h4>Create by LCM</h4>
+    <!-- 主要內容區 -->
+    <div id="main">
+        <!-- 搜尋框 -->
+        <div id="search">
+            <img src="photo/search.png" width="40px" height="40px">
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="輸入搜尋">
+                <div id="search-suggestions"></div>
             </div>
         </div>
+
+        <!-- 時間和日期區域 -->
+        <div class="widget">
+            <h1 id="local-time">載入中...</h1>
+            <h2 id="lunar-date">載入中...</h2>
+        </div>
+
+        <!-- 天氣資訊區域 -->
+        <div class="widget">
+            <h2 id="city">正在獲取城市資訊...</h2>
+            <h3 id="country">正在獲取國家資訊...</h3>
+            <div id="current-weather">正在獲取天氣資訊...</div>
+            <div id="forecast-weather" class="forecast-container"></div>
+        </div>
+
+        <!-- 倒數計時區域 -->
+        <div class="widget">
+            <div id="countdown">
+                <h2>距離2025年還有</h2>
+                <div id="countdown-timer">
+                    <span id="days">00</span>天
+                    <span id="hours">00</span>時
+                    <span id="minutes">00</span>分
+                    <span id="seconds">00</span>秒
+                </div>
+            </div>
+        </div>
+
+        <!-- 待辦事項區域 -->
+        <div class="widget" id="todo-widget">
+            <h2>待辦事項</h2>
+            <div class="todo-input">
+                <input type="text" id="todo-input" placeholder="新增待辦事項">
+                <button onclick="addTodo()">新增</button>
+            </div>
+            <ul id="todo-list"></ul>
+        </div>
+    </div>
+
+    <!-- 背景設置對話框 -->
+    <div id="background-settings" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeBackgroundSettings()">&times;</span>
+            <h2>背景設置</h2>
+            <div class="background-options">
+                <div class="option">
+                    <h3>上傳圖片</h3>
+                    <input type="file" id="background-upload" accept="image/*" onchange="handleBackgroundUpload(event)">
+                </div>
+                <div class="option">
+                    <h3>圖片URL</h3>
+                    <input type="text" id="background-url" placeholder="輸入圖片URL">
+                    <button onclick="setBackgroundFromUrl()">設置</button>
+                </div>
+                <div class="option">
+                    <h3>預設背景</h3>
+                    <div id="preset-backgrounds"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頁尾 -->
+    <div class="footer">
         
     </div>
 
+    <!-- 腳本 -->
     <script src="scripts/script.js"></script>
 </body>
 </html>

@@ -1,122 +1,308 @@
-body {font-family: Arial, sans-serif;
+/* 基礎設置 */
+:root {
+    --sidebar-width: 60px;
+    --widget-spacing: 20px;
+    --border-radius: 10px;
+}
+
+/* 響應式基礎樣式 */
+* {
     margin: 0;
-    display: flex;
-    background-image:url('photo/RobloxScreenShot20240905_223451164.png'); /* 壁紙 */
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft JhengHei', sans-serif;
+    background-image: url('photo/RobloxScreenShot20240905_223451164.png');
     background-size: cover;
-    color: #ffffff;
-    min-height: 100vh; /* 使body充滿整個視口 */
-    overflow: hidden; /* 隱藏滾動條 */
-    background-position: center; /* 在中心對齊 */
-    background-repeat: no-repeat; /* 不重複圖片 */
-    margin: 0; /* 移除預設的邊距 */
-    height: 100vh; /* 設定高度為視窗高度 */
-}
-#container {
-    display: flex;
-    width: 100%;
-    height: 100%;
-}
-#sidebar {
-    width: auto; /* 縮小側邊欄寬度 */
-    background-color: rgba(200, 200, 200, 0.226); /* 灰色背景和透明度 */
-    padding: 10px; /* 縮小內邊距 */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* 內容居中 */
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
-    margin: 100px 0; /* 調整側邊欄的外邊距 */
-}
-#sidebar img {
-    width: 40px; /* 圖片大小 */
-    height: 40px; /* 圖片大小 */
-    margin: 10px 0; /* 圖片間距 */
-    cursor: pointer; /* 鼠標懸停樣式 */
-    transition: transform 0.2s; /* 動畫效果 */
-}
-#sidebar img:hover {
-    transform: scale(1.1); /* 鼠標懸停放大效果 */
-}
-#main {
-    flex: 1;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    margin-left: var(--sidebar-width);
     padding: 20px;
+}
+
+/* 側邊欄響應式設計 */
+#sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    background-color: rgba(255, 225, 225, 0.19);
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 20px; /* 調整主內容區域的外邊距 */
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    overflow-y: auto; /* 如果內容太多，則允許滾動 */
-    height: calc(100vh - 40px); /* 使主內容區域填滿剩餘空間 */
+    padding: 20px 0;
+    z-index: 1000;
 }
-#search {
-    border-radius: 10px;
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-input[type="text"] {
-    padding: 10px;
-    width: 250px;
-    margin-right: 10px;
-    border-radius: 5px;
-    border: 1px solid #007BFF;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-button {
-    padding: 10px 15px;
+
+#sidebar img {
+    width: 40px;
+    height: 40px;
+    margin: 10px 0;
     cursor: pointer;
+    transition: transform 0.3s;
+}
+
+#sidebar img:hover {
+    transform: scale(1.1);
+}
+
+/* 主要內容區域響應式設計 */
+#main {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    gap: var(--widget-spacing);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* 小部件通用樣式 */
+.widget {
+    background-color: var(--widget-bg);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 6px var(--shadow-color);
+    backdrop-filter: blur(10px);
+}
+
+/* 搜尋框響應式設計 */
+#search {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: var(--widget-bg);
+    padding: 15px;
+    border-radius: var(--border-radius);
+}
+
+.search-container {
+    flex-grow: 1;
+    position: relative;
+}
+
+#search-input {
+    width: 100%;
+    padding: 10px;
     border: none;
     border-radius: 5px;
-    background-color: #007BFF;
-    color: white;
-    transition: background 0.3s;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
 }
-button:hover {
-    background-color: #0056b3;
+
+/* 天氣預報響應式設計 */
+.forecast-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
 }
-#weather {
-    background-color: rgba(255, 255, 255, 0.24);
-    color: rgb(255, 255, 255);
+
+.forecast-day {
+    text-align: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+/* 待辦事項響應式設計 */
+.todo-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.todo-input input {
+    flex-grow: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+/* 模態框響應式設計 */
+.modal-content {
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
     padding: 20px;
-    border-radius: 10px;
-    width: 80%;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    background: var(--bg-color);
+    border-radius: var(--border-radius);
 }
-h2 {
-    display: block;
-    font-size: 1.5em;
-    margin-block-start: 0.83em;
-    margin-block-end: 0.83em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    font-weight: bold;
-    unicode-bidi: isolate;
+
+/* 響應式排版調整 */
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: 50px;
+        --widget-spacing: 15px;
+    }
+
+    body {
+        padding: 10px;
+    }
+
+    #sidebar img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .widget {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    h2 {
+        font-size: 1.2em;
+    }
 }
-#local-time {
-    font-size: 28px;
-    margin: 10px 0;
-    color: #FFD700; /* 金色 */
+
+/* 手機版特別優化 */
+@media (max-width: 480px) {
+    body {
+        margin-left: 0;
+        margin-bottom: 60px;
+    }
+
+    #sidebar {
+        top: auto;
+        bottom: 0;
+        width: 100%;
+        height: 50px;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 5px 0;
+    }
+
+    #sidebar img {
+        width: 25px;
+        height: 25px;
+        margin: 0;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 10px auto;
+    }
+
+    .forecast-container {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    }
 }
-.widget {
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    padding: 15px;
-    margin: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    width: 300px;
-    text-align: center;
+
+/* 主題相關樣式 */
+:root[data-theme="light"] {
+    --bg-color: rgba(255, 255, 255, 0.8);
+    --text-color: #333;
+    --widget-bg: rgba(255, 255, 255, 0.9);
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --icon-filter: none;  /* 深色圖標 */
 }
-.footer {
-    position: fixed; /* 固定在頁面底部 */
-    bottom: 0; /* 距離底部 0 像素 */
-    left: 0; /* 距離左邊 0 像素 */
-    right: 0; /* 距離右邊 0 像素 */
-    background-color: rgba(0, 0, 0, 0.342); /* 背景顏色 */
-    color: white; /* 文字顏色 */
-    text-align: center; /* 文字居中 */
-    padding: 10px 0; /* 上下內邊距 */
+
+:root[data-theme="dark"] {
+    --bg-color: rgba(0, 0, 0, 0.7);
+    --text-color: #fff;
+    --widget-bg: rgba(0, 0, 0, 0.8);
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --icon-filter: invert(1);  /* 將圖標轉為白色 */
+}
+
+/* 應用圖標顏色過濾器 */
+#sidebar img {
+    filter: var(--icon-filter);
+    transition: filter 0.3s, transform 0.3s;
+}
+
+#search img
+
+/* 更新所有文字顏色 */
+body, 
+.widget, 
+.modal-content,
+h1, h2, h3, h4, p,
+#local-time,
+#lunar-date,
+#city,
+#country,
+#current-weather,
+#forecast-weather,
+#countdown,
+.todo-item,
+.modal-header h2,
+.tool-item span,
+.about-content {
+    color: var(--text-color);
+}
+
+/* 輸入框樣式 */
+input[type="text"],
+input[type="search"],
+textarea {
+    color: var(--text-color);
+    background: var(--widget-bg);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 按鈕樣式 */
+button {
+    color: var(--text-color);
+    background: var(--widget-bg);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 確保模態框內容也跟隨主題 */
+.modal-content {
+    background-color: var(--bg-color);
+}
+
+/* 工具項目樣式 */
+.tool-item {
+    background: var(--widget-bg);
+}
+
+/* 圖標顏色過渡效果 */
+#sidebar img,
+.widget img,
+.tool-item i {
+    transition: filter 0.3s;
+    filter: var(--icon-filter);
+}
+
+/* 觸控設備優化 */
+@media (hover: none) {
+    #sidebar img:hover {
+        transform: none;
+    }
+
+    .todo-item, button {
+        padding: 12px;  /* 增加點擊區域 */
+    }
+
+    input[type="text"] {
+        font-size: 16px;  /* 防止 iOS 自動縮放 */
+    }
+}
+
+/* 印刷樣式 */
+@media print {
+    body {
+        margin: 0;
+        background: white;
+    }
+
+    #sidebar, .modal {
+        display: none;
+    }
+
+    .widget {
+        break-inside: avoid;
+        background: none;
+        box-shadow: none;
+    }
 }
