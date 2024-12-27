@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /* 基礎設置 */
 :root {
     --sidebar-width: 60px;
@@ -15,7 +14,7 @@
 
 body {
     font-family: 'Microsoft JhengHei', sans-serif;
-    background-image: url('photo/RobloxScreenShot20240905_223451164.png');
+    background-image: url('photo\tunnel.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -29,14 +28,21 @@ body {
     position: fixed;
     left: 0;
     top: 0;
-    height: 100vh;
+    height: 80vh;
     width: var(--sidebar-width);
     background-color: rgba(255, 225, 225, 0.19);
     display: flex;
-    flex-direction: column;
-    align-items: center;
     padding: 20px 0;
     z-index: 1000;
+    width: auto; /* 縮小側邊欄寬度 */
+    background-color: rgba(200, 200, 200, 0.226); /* 灰色背景和透明度 */
+    padding: 10px; /* 縮小內邊距 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 內容居中 */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    margin: 100px 0px; /* 調整側邊欄的外邊距 */
 }
 
 #sidebar img {
@@ -220,7 +226,10 @@ body {
     transition: filter 0.3s, transform 0.3s;
 }
 
-#search img
+#search img {
+    filter: var(--icon-filter);
+    transition: filter 0.3s, transform 0.3s;
+}
 
 /* 更新所有文字顏色 */
 body, 
@@ -267,7 +276,7 @@ button {
     background: var(--widget-bg);
 }
 
-/* 圖標顏色過渡效果 */
+/* 圖���顏色過渡效果 */
 #sidebar img,
 .widget img,
 .tool-item i {
@@ -306,127 +315,259 @@ button {
         background: none;
         box-shadow: none;
     }
-=======
-body {font-family: Arial, sans-serif;
-    margin: 0;
-    display: flex;
-    background-image:url('photo/RobloxScreenShot20240905_223451164.png'); /* 壁紙 */
+}
+
+/* 添加背景設置相關樣式 */
+.background-preview {
+    margin: 20px 0;
+}
+
+#bg-preview {
+    width: 100%;
+    height: 150px;
+    border-radius: 8px;
     background-size: cover;
-    color: #ffffff;
-    min-height: 100vh; /* 使body充滿整個視口 */
-    overflow: hidden; /* 隱藏滾動條 */
-    background-position: center; /* 在中心對齊 */
-    background-repeat: no-repeat; /* 不重複圖片 */
-    margin: 0; /* 移除預設的邊距 */
-    height: 100vh; /* 設定高度為視窗高度 */
+    background-position: center;
+    margin-top: 10px;
 }
-#container {
-    display: flex;
+
+.background-controls {
+    margin: 20px 0;
+}
+
+.control-group {
+    margin: 15px 0;
+}
+
+.control-group h3 {
+    margin-bottom: 8px;
+}
+
+.control-group input[type="range"] {
     width: 100%;
-    height: 100%;
+    margin: 5px 0;
 }
-#sidebar {
-    width: auto; /* 縮小側邊欄寬度 */
-    background-color: rgba(200, 200, 200, 0.226); /* 灰色背景和透明度 */
-    padding: 10px; /* 縮小內邊距 */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* 內容居中 */
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
-    margin: 100px 0; /* 調整側邊欄的外邊距 */
+
+.control-group span {
+    display: inline-block;
+    min-width: 50px;
+    text-align: right;
 }
-#sidebar img {
-    width: 40px; /* 圖片大小 */
-    height: 40px; /* 圖片大小 */
-    margin: 10px 0; /* 圖片間距 */
-    cursor: pointer; /* 鼠標懸停樣式 */
-    transition: transform 0.2s; /* 動畫效果 */
+
+.background-options {
+    display: grid;
+    gap: 20px;
+    margin-top: 20px;
 }
-#sidebar img:hover {
-    transform: scale(1.1); /* 鼠標懸停放大效果 */
-}
-#main {
-    flex: 1;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 20px; /* 調整主內容區域的外邊距 */
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    overflow-y: auto; /* 如果內容太多，則允許滾動 */
-    height: calc(100vh - 40px); /* 使主內容區域填滿剩餘空間 */
-}
-#search {
-    border-radius: 10px;
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-input[type="text"] {
-    padding: 10px;
-    width: 250px;
-    margin-right: 10px;
-    border-radius: 5px;
-    border: 1px solid #007BFF;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-button {
-    padding: 10px 15px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    background-color: #007BFF;
-    color: white;
-    transition: background 0.3s;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-button:hover {
-    background-color: #0056b3;
-}
-#weather {
-    background-color: rgba(255, 255, 255, 0.24);
-    color: rgb(255, 255, 255);
-    padding: 20px;
-    border-radius: 10px;
-    width: 80%;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-h2 {
-    display: block;
-    font-size: 1.5em;
-    margin-block-start: 0.83em;
-    margin-block-end: 0.83em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    font-weight: bold;
-    unicode-bidi: isolate;
-}
-#local-time {
-    font-size: 28px;
-    margin: 10px 0;
-    color: #FFD700; /* 金色 */
-}
-.widget {
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
+
+.option {
+    background: rgba(255, 255, 255, 0.1);
     padding: 15px;
-    margin: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    width: 300px;
-    text-align: center;
+    border-radius: 8px;
 }
-.footer {
-    position: fixed; /* 固定在頁面底部 */
-    bottom: 0; /* 距離底部 0 像素 */
-    left: 0; /* 距離左邊 0 像素 */
-    right: 0; /* 距離右邊 0 像素 */
-    background-color: rgba(0, 0, 0, 0.342); /* 背景顏色 */
-    color: white; /* 文字顏色 */
-    text-align: center; /* 文字居中 */
-    padding: 10px 0; /* 上下內邊距 */
->>>>>>> da32161d7169fd3214e1eb2f7da417228defb02e
+
+#preset-backgrounds {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.preset-bg {
+    width: 80px;
+    height: 80px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.preset-bg:hover {
+    transform: scale(1.05);
+}
+
+/* 添加重置按鈕樣式 */
+.reset-button {
+    margin-top: 20px;
+    padding: 8px 16px;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.reset-button:hover {
+    background-color: #cc0000;
+}
+
+/* 改進預覽區域樣式 */
+#bg-preview {
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* 改進文件上傳按鈕樣式 */
+input[type="file"] {
+    display: none;
+}
+
+.file-upload-label {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: var(--widget-bg);
+    color: var(--text-color);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.file-upload-label:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 改進預設背景網格樣式 */
+#preset-backgrounds {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* 添加滾動條樣式 */
+#preset-backgrounds::-webkit-scrollbar {
+    width: 6px;
+}
+
+#preset-backgrounds::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+#preset-backgrounds::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+/* 改進控制項樣式 */
+.control-group input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    outline: none;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--text-color);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* 添加載入動畫 */
+.loading {
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+/* 修改背景設置對話框的預設顯示狀態 */
+#background-settings {
+    display: none; /* 預設隱藏 */
+}
+
+/* 上傳圖片區域樣式 */
+.upload-area {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin: 15px 0;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.upload-area.drag-over {
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* 上傳按鈕樣式 */
+.file-upload-label {
+    display: inline-block;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 10px 0;
+}
+
+.file-upload-label:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.file-upload-label:active {
+    transform: translateY(1px);
+}
+
+/* 隱藏原始檔案輸入框 */
+input[type="file"] {
+    display: none;
+}
+
+/* 上傳提示文字 */
+.upload-text {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 10px 0;
+    font-size: 0.9em;
+}
+
+/* 預覽圖片容器 */
+.image-preview {
+    max-width: 100%;
+    margin: 15px 0;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* 載入中動畫 */
+.loading-spinner {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
 }

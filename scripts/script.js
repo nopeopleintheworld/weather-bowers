@@ -19,6 +19,8 @@ function getLocation() {
 function showPosition(position) {
     const latitude = position.coords.latitude;
     const longitude = position.coords.longitude;
+    // 保存最後知道的位置
+    window.lastKnownPosition = { latitude, longitude };
     getCityName(latitude, longitude);
 }
 
@@ -28,11 +30,7 @@ function showError(error) {
             document.getElementById('city').textContent = "用戶拒絕了地理位置請求。";
             break;
         case error.POSITION_UNAVAILABLE:
-<<<<<<< HEAD
-            document.getElementById('city').textContent = "位置資��不可用。";
-=======
             document.getElementById('city').textContent = "位置資訊不可用。";
->>>>>>> da32161d7169fd3214e1eb2f7da417228defb02e
             break;
         case error.TIMEOUT:
             document.getElementById('city').textContent = "請求位置超時。";
@@ -44,13 +42,8 @@ function showError(error) {
 }
 
 function getCityName(latitude, longitude) {
-<<<<<<< HEAD
     const apiKey = 'e3c3e2d1964b4fd297dfd180cde9a6e3';
     const geoApiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}&language=zh-TW`;
-=======
-    const apiKey = 'e3c3e2d1964b4fd297dfd180cde9a6e3'; 
-    const geoApiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}&language=en`;
->>>>>>> da32161d7169fd3214e1eb2f7da417228defb02e
 
     fetch(geoApiUrl)
         .then(response => {
@@ -60,7 +53,6 @@ function getCityName(latitude, longitude) {
             return response.json();
         })
         .then(data => {
-<<<<<<< HEAD
             if (data.results && data.results.length > 0) {
                 const components = data.results[0].components;
                 // 嘗試不同的城市級別名稱
@@ -77,6 +69,7 @@ function getCityName(latitude, longitude) {
                 // 使用英文城市名稱查詢天氣
                 const cityForWeather = components.city_en || 
                                      components.town_en || 
+                                     components.district_en ||
                                      city;
                 getWeatherAndForecast(cityForWeather);
             } else {
@@ -87,63 +80,90 @@ function getCityName(latitude, longitude) {
             console.error('Error fetching city name:', error);
             document.getElementById('city').textContent = "無法獲取城市資訊";
             document.getElementById('country').textContent = "";
-=======
-            if (data.results.length > 0) {
-                const city = data.results[0].components.city || data.results[0].components.town;
-                const country = data.results[0].components.country;
-                document.getElementById('city').textContent = `你當前所在的城市是：${city}`;
-                document.getElementById('country').textContent = `國家：${country}`; 
-                getWeather(city);
-            } else {
-                document.getElementById('city').textContent = "未能找到城市名稱。";
-            }
-        })
-        .catch(error => {
-            document.getElementById('city').textContent = "無法獲取城市資訊。";
-            console.error('Error fetching city name:', error);
->>>>>>> da32161d7169fd3214e1eb2f7da417228defb02e
         });
 }
 
 // 獲取天氣資訊
-<<<<<<< HEAD
 async function getWeatherAndForecast(city) {
     const apiKey = '8aedf7b3c49897fccbfced0645a4d57b';
-    const encodedCity = encodeURIComponent(city);
-    const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodedCity}&appid=${apiKey}&lang=zh_tw&units=metric`;
-    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${encodedCity}&appid=${apiKey}&lang=zh_tw&units=metric`;
-
+    
     try {
-        // 獲取當前天氣
-        const currentResponse = await fetch(currentWeatherUrl);
-        if (!currentResponse.ok) {
-            throw new Error('城市未找到');
-        }
-        const currentData = await currentResponse.json();
+        // 先嘗試使用原始城市名稱
+        let weatherData = await tryGetWeather(city, apiKey);
         
-        // 確保數據存在
-        if (!currentData || !currentData.weather || !currentData.weather[0]) {
-            throw new Error('無效的天氣數據');
+        // 如果失敗，嘗試使用英文城市名稱（如果不同的話）
+        if (!weatherData && city.match(/[\u4e00-\u9fa5]/)) { // 檢查是否包含中文
+            const englishCity = await translateToEnglish(city);
+            if (englishCity && englishCity !== city) {
+                weatherData = await tryGetWeather(englishCity, apiKey);
+            }
         }
-
-        // 更新當前天氣
-        updateCurrentWeather(currentData);
         
-        // 獲取天氣預報
-        const forecastResponse = await fetch(forecastUrl);
-        if (!forecastResponse.ok) {
-            throw new Error('無法獲取天氣預報');
+        // 如果仍然失敗，使用經緯度查詢
+        if (!weatherData && window.lastKnownPosition) {
+            const { latitude, longitude } = window.lastKnownPosition;
+            weatherData = await getWeatherByCoords(latitude, longitude, apiKey);
         }
-        const forecastData = await forecastResponse.json();
         
-        // 更新天氣預報
-        if (forecastData && forecastData.list) {
-            updateForecast(forecastData);
+        if (weatherData) {
+            updateCurrentWeather(weatherData);
+            // 獲取天氣預報
+            const forecastData = await getForecastData(weatherData.name, apiKey);
+            if (forecastData) {
+                updateForecast(forecastData);
+            }
+        } else {
+            throw new Error('無法獲取天氣資訊');
         }
+        
     } catch (error) {
         console.error('Error fetching weather data:', error);
-        document.getElementById('current-weather').textContent = '無法獲取天氣資訊';
-        document.getElementById('forecast-weather').textContent = '';
+        document.getElementById('current-weather').innerHTML = '無法獲取天氣資訊';
+        document.getElementById('forecast-weather').innerHTML = '';
+    }
+}
+
+// 嘗試獲取天氣資訊
+async function tryGetWeather(city, apiKey) {
+    const encodedCity = encodeURIComponent(city);
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodedCity}&appid=${apiKey}&lang=zh_tw&units=metric`;
+    
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (error) {
+        console.error('Error in tryGetWeather:', error);
+        return null;
+    }
+}
+
+// 使用經緯度獲取天氣
+async function getWeatherByCoords(lat, lon, apiKey) {
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&lang=zh_tw&units=metric`;
+    
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (error) {
+        console.error('Error in getWeatherByCoords:', error);
+        return null;
+    }
+}
+
+// 獲取天氣預報
+async function getForecastData(city, apiKey) {
+    const encodedCity = encodeURIComponent(city);
+    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${encodedCity}&appid=${apiKey}&lang=zh_tw&units=metric`;
+    
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (error) {
+        console.error('Error in getForecastData:', error);
+        return null;
     }
 }
 
@@ -179,28 +199,6 @@ function updateForecast(data) {
         `;
         forecastDiv.innerHTML += dayHtml;
     });
-=======
-function getWeather(city) {
-    const apiKey = '8aedf7b3c49897fccbfced0645a4d57b';
-    const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=8aedf7b3c49897fccbfced0645a4d57b&lang=zh_tw&units=metric`;
-
-    fetch(weatherApiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('城市未找到');
-            }
-            return response.json();
-        })
-        .then(data => {
-            const description = data.weather[0].description;
-            const temperature = data.main.temp;
-            document.getElementById('weather-info').textContent = `當前溫度: ${temperature} °C, 天氣: ${description}`;
-        })
-        .catch(error => {
-            document.getElementById('weather-info').textContent = '無法獲取天氣資訊';
-            console.error('Error fetching weather data:', error);
-        });
->>>>>>> da32161d7169fd3214e1eb2f7da417228defb02e
 }
 
 // Google 搜尋功能
@@ -216,7 +214,6 @@ document.getElementById('search-input').addEventListener('keydown', (event) => {
     }
 });
 
-<<<<<<< HEAD
 function updateCountdown() {
     const now = new Date();
     const target = new Date('2025-01-01T00:00:00');
@@ -287,28 +284,327 @@ document.addEventListener('click', (e) => {
 
 // 預設背景圖片列表
 const backgrounds = [
-    'RobloxScreenShot20240905_223451164.png',
-    'background2.jpg',
-    'background3.jpg',
-    // 添加更多預設背景
+    'photo/tunnel.jpg'
 ];
 
-// 打開背景設置對話框
+// 初始化預設背景
+function initPresetBackgrounds() {
+    const presetContainer = document.getElementById('preset-backgrounds');
+    if (!presetContainer) return;
+
+    presetContainer.innerHTML = '';
+    backgrounds.forEach((bg, index) => {
+        const div = document.createElement('div');
+        div.className = 'preset-bg';
+        div.style.backgroundImage = `url('${bg}')`;
+        div.onclick = () => setBackground(bg);
+        presetContainer.appendChild(div);
+    });
+}
+
+// 處理背景圖片上傳
+function handleBackgroundUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // 檢查文件類型
+    if (!file.type.match('image.*')) {
+        alert('請上傳圖片文件（支援 jpg、png、gif 等格式）');
+        return;
+    }
+
+    // 檢查文件大小（限制為 5MB）
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+        alert('圖片大小不能超過 5MB');
+        return;
+    }
+
+    // 顯示載入中狀態
+    const preview = document.getElementById('bg-preview');
+    preview.classList.add('loading');
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        // 創建一個新的圖片對象來檢查尺寸
+        const img = new Image();
+        img.onload = function() {
+            // 檢查圖片尺寸
+            if (img.width < 800 || img.height < 600) {
+                alert('建議上傳至少 800x600 像素的圖片以獲得最佳效果');
+            }
+
+            // 設置背景
+            setBackground(e.target.result);
+            saveBackgroundSettings();
+            updatePreview();
+
+            // 移除載入中狀態
+            preview.classList.remove('loading');
+
+            // 清空文件輸入框，允許重複上傳相同文件
+            document.getElementById('background-upload').value = '';
+        };
+
+        img.onerror = function() {
+            alert('圖片載入失敗，請確認文件是否損壞');
+            preview.classList.remove('loading');
+            document.getElementById('background-upload').value = '';
+        };
+
+        img.src = e.target.result;
+    };
+
+    reader.onerror = function() {
+        alert('讀取文件時發生錯誤');
+        preview.classList.remove('loading');
+        document.getElementById('background-upload').value = '';
+    };
+
+    reader.readAsDataURL(file);
+}
+
+// 從 URL 設置背景
+function setBackgroundFromUrl() {
+    const url = document.getElementById('background-url').value.trim();
+    if (!url) {
+        alert('請輸入有效的圖片 URL');
+        return;
+    }
+
+    // 顯示載入中狀態
+    const preview = document.getElementById('bg-preview');
+    preview.classList.add('loading');
+
+    // 驗證 URL 是否為圖片
+    const img = new Image();
+    img.onload = function() {
+        setBackground(url);
+        preview.classList.remove('loading');
+        document.getElementById('background-url').value = ''; // 清空輸入框
+    };
+
+    img.onerror = function() {
+        alert('無法載入圖片，請確認 URL 是否正確');
+        preview.classList.remove('loading');
+    };
+
+    img.src = url;
+}
+
+// 設置背景
+function setBackground(src) {
+    // 創建一個新的圖片對象來預載入
+    const img = new Image();
+    img.onload = function() {
+        document.body.style.backgroundImage = `url('${src}')`;
+        const preview = document.getElementById('bg-preview');
+        if (preview) {
+            preview.style.backgroundImage = `url('${src}')`;
+        }
+
+        // 保存到本地存儲
+        saveBackgroundSettings();
+    };
+
+    img.onerror = function() {
+        alert('設置背景圖片失敗');
+    };
+
+    img.src = src;
+}
+
+// 更新預覽
+function updatePreview() {
+    const preview = document.getElementById('bg-preview');
+    if (!preview) return;
+
+    preview.style.backgroundImage = document.body.style.backgroundImage;
+    preview.style.backgroundPosition = document.body.style.backgroundPosition;
+    preview.style.filter = document.body.style.filter;
+}
+
+// 重置背景設置
+function resetBackgroundSettings() {
+    const defaultSettings = {
+        backgroundImage: `url('photo/tunnel.jpg')`,
+        backgroundPosition: 'center',
+        filter: 'none'
+    };
+
+    applyBackgroundSettings(defaultSettings);
+    saveBackgroundSettings();
+    updatePreview();
+}
+
+// 用背景設置
+function applyBackgroundSettings(settings) {
+    document.body.style.backgroundImage = settings.backgroundImage;
+    document.body.style.backgroundPosition = settings.backgroundPosition;
+    document.body.style.filter = settings.filter;
+}
+
+// 載入保存的設置
+function loadSavedBackgroundSettings() {
+    const savedSettings = localStorage.getItem('backgroundSettings');
+    if (savedSettings) {
+        try {
+            const settings = JSON.parse(savedSettings);
+            applyBackgroundSettings(settings);
+        } catch (e) {
+            console.error('載入背景設置時出錯:', e);
+            resetBackgroundSettings();
+        }
+    }
+}
+
+// 修改 openBackgroundSettings 函數，添加重置按鈕
 function openBackgroundSettings() {
     const modal = document.getElementById('background-settings');
     modal.style.display = 'block';
     
-    // 載入預設背景選項
-    const presetContainer = document.getElementById('preset-backgrounds');
-    presetContainer.innerHTML = '';
+    // 更新模態框內容
+    const modalContent = modal.querySelector('.modal-content');
+    modalContent.innerHTML = `
+        <span class="close" onclick="closeBackgroundSettings()">&times;</span>
+        <h2>背景設置</h2>
+        
+        <div class="background-preview">
+            <h3>預覽</h3>
+            <div id="bg-preview"></div>
+        </div>
+
+        <div class="background-controls">
+            <div class="control-group">
+                <h3>模糊度</h3>
+                <input type="range" id="blur-control" min="0" max="20" value="0" 
+                    onchange="updateBackgroundEffect('blur', this.value)">
+                <span id="blur-value">0px</span>
+            </div>
+
+            <div class="control-group">
+                <h3>亮度</h3>
+                <input type="range" id="brightness-control" min="0" max="200" value="100" 
+                    onchange="updateBackgroundEffect('brightness', this.value)">
+                <span id="brightness-value">100%</span>
+            </div>
+
+            <div class="control-group">
+                <h3>背景位置</h3>
+                <select id="position-control" onchange="updateBackgroundPosition(this.value)">
+                    <option value="center">置中</option>
+                    <option value="top">頂部</option>
+                    <option value="bottom">底部</option>
+                    <option value="left">左側</option>
+                    <option value="right">右側</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="background-options">
+            <div class="option">
+                <h3>上傳圖片</h3>
+                <input type="file" id="background-upload" accept="image/*" onchange="handleBackgroundUpload(event)">
+            </div>
+            
+            <div class="option">
+                <h3>圖片URL</h3>
+                <input type="text" id="background-url" placeholder="輸入圖片URL">
+                <button onclick="setBackgroundFromUrl()">設置</button>
+            </div>
+            
+            <div class="option">
+                <h3>預設背景</h3>
+                <div id="preset-backgrounds"></div>
+            </div>
+        </div>
+
+        <button class="reset-button" onclick="resetBackgroundSettings()">重置設置</button>
+    `;
+
+    // 載入當前設置
+    loadCurrentSettings();
+
+    // 初始化預設背景
+    initPresetBackgrounds();
     
-    backgrounds.forEach((bg, index) => {
-        const div = document.createElement('div');
-        div.className = 'preset-bg';
-        div.style.backgroundImage = `url('photo/${bg}')`;
-        div.onclick = () => setBackground(`photo/${bg}`);
-        presetContainer.appendChild(div);
+    // 更新預覽
+    updatePreview();
+}
+
+// 更新背景效果
+function updateBackgroundEffect(effect, value) {
+    const body = document.body;
+    const preview = document.getElementById('bg-preview');
+    const currentFilters = getComputedStyle(body).filter.split(' ');
+    
+    let newFilters = [];
+    if (effect === 'blur') {
+        document.getElementById('blur-value').textContent = `${value}px`;
+        newFilters.push(`blur(${value}px)`);
+    } else if (effect === 'brightness') {
+        document.getElementById('brightness-value').textContent = `${value}%`;
+        newFilters.push(`brightness(${value}%)`);
+    }
+    
+    // 保持其他效果不變
+    currentFilters.forEach(filter => {
+        if (!filter.includes(effect)) {
+            newFilters.push(filter);
+        }
     });
+    
+    const filterString = newFilters.join(' ');
+    body.style.filter = filterString;
+    preview.style.filter = filterString;
+    
+    // 保存設置
+    saveBackgroundSettings();
+}
+
+// 更新背景位置
+function updateBackgroundPosition(position) {
+    document.body.style.backgroundPosition = position;
+    document.getElementById('bg-preview').style.backgroundPosition = position;
+    saveBackgroundSettings();
+}
+
+// 保存所有背景設置
+function saveBackgroundSettings() {
+    const settings = {
+        backgroundImage: document.body.style.backgroundImage,
+        backgroundPosition: document.body.style.backgroundPosition,
+        filter: document.body.style.filter
+    };
+    localStorage.setItem('backgroundSettings', JSON.stringify(settings));
+}
+
+// 載入當前設置
+function loadCurrentSettings() {
+    const settings = JSON.parse(localStorage.getItem('backgroundSettings') || '{}');
+    const preview = document.getElementById('bg-preview');
+    
+    // 設置預覽區域的背景
+    preview.style.backgroundImage = document.body.style.backgroundImage;
+    preview.style.backgroundPosition = document.body.style.backgroundPosition;
+    preview.style.filter = document.body.style.filter;
+    
+    // 更新控制項的值
+    const blurMatch = (settings.filter || '').match(/blur\((\d+)px\)/);
+    if (blurMatch) {
+        document.getElementById('blur-control').value = blurMatch[1];
+        document.getElementById('blur-value').textContent = `${blurMatch[1]}px`;
+    }
+    
+    const brightnessMatch = (settings.filter || '').match(/brightness\((\d+)%\)/);
+    if (brightnessMatch) {
+        document.getElementById('brightness-control').value = brightnessMatch[1];
+        document.getElementById('brightness-value').textContent = `${brightnessMatch[1]}%`;
+    }
+    
+    if (settings.backgroundPosition) {
+        document.getElementById('position-control').value = settings.backgroundPosition;
+    }
 }
 
 // 關閉背景設置對話框
@@ -316,95 +612,32 @@ function closeBackgroundSettings() {
     document.getElementById('background-settings').style.display = 'none';
 }
 
-// 處理用戶上傳的背景圖片
-function handleBackgroundUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            setBackground(e.target.result);
-            saveBackgroundSetting(e.target.result);
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-// 從URL設置背景
-function setBackgroundFromUrl() {
-    const url = document.getElementById('background-url').value.trim();
-    if (url) {
-        // 先驗證URL是否有效
-        const img = new Image();
-        img.onload = function() {
-            setBackground(url);
-            saveBackgroundSetting(url);
-        };
-        img.onerror = function() {
-            alert('無法載入圖片，請確認URL是否正確');
-        };
-        img.src = url;
-    }
-}
-
-// 設置背景
-function setBackground(src) {
-    document.body.style.backgroundImage = `url('${src}')`;
-    closeBackgroundSettings();
-}
-
-// 保存背景設置
-function saveBackgroundSetting(src) {
-    localStorage.setItem('customBackground', src);
-}
-
-// 載入保存的背景設置
-document.addEventListener('DOMContentLoaded', () => {
-    const savedBg = localStorage.getItem('customBackground');
-    if (savedBg) {
-        setBackground(savedBg);
-    }
-});
-
-// 點擊模態框外部關閉
-window.onclick = function(event) {
-    const modal = document.getElementById('background-settings');
-    if (event.target === modal) {
-        closeBackgroundSettings();
-    }
-}
-
 // 農曆日期計算和顯示功能
 function updateLunarDate() {
     try {
         const date = new Date();
-        
-        // 使用 lunar.js 計算農曆日期
         const lunar = Lunar.fromDate(date);
         
-        // 獲取農曆年月日
-        const lunarYear = lunar.getYear();
-        const lunarMonth = lunar.getMonth();
-        const lunarDay = lunar.getDay();
+        const yearZh = lunar.getYearInChinese();
+        const monthZh = lunar.getMonthInChinese();
+        const dayZh = lunar.getDayInChinese();
         
-        // 獲取天干地支年份
-        const cyclicalYear = lunar.getYearInGanZhi();
+        // 判斷是否為閏月
+        const isLeap = lunar.getMonthInChinese().includes('閏');
         
-        // 獲取生肖
-        const zodiac = lunar.getYearShengXiao();
+        // 組合農曆日期字串
+        const lunarDateStr = `農曆 ${yearZh}年${isLeap ? '閏' : ''}${monthZh}月${dayZh}`;
         
-        // 獲取農曆月份名稱（需要處理閏月）
-        const monthName = lunar.isLeapMonth() ? `閏${lunarMonth}` : lunarMonth;
-        
-        // 更新顯示
-        document.getElementById('lunar-date').innerHTML = `
-            農曆 ${cyclicalYear}年 (${zodiac}年)<br>
-            ${monthName}月 ${lunarDay}日
-        `;
+        document.getElementById('lunar-date').textContent = lunarDateStr;
     } catch (error) {
         console.error('Error updating lunar date:', error);
-        document.getElementById('lunar-date').textContent = '農曆日期計算錯誤';
+        document.getElementById('lunar-date').textContent = '無法獲取農曆日期';
     }
 }
+
+// 定時更新農曆日期
+setInterval(updateLunarDate, 1000 * 60 * 60); // 每小時更新一次
+updateLunarDate(); // 初始更新
 
 // 添加農曆節日判斷功能
 function getLunarFestival(lunar) {
@@ -644,21 +877,21 @@ const sidebarFunctions = {
     // 資訊功能
     info: () => {
         const infoModal = createModal('關於', `
-            <div class="about-content">
-                <h3>版本資訊</h3>
-                <p>當前版本：1.0.0</p>
-                <h3>作者資訊</h3>
-                <p>作者：LCM</p>
-                <h3>更新日誌</h3>
-                <ul id="changelog">
-                    <li>2024/03/21 - 初始版本發布</li>
-                    <li>2024/03/22 - 添加農曆日期功能</li>
-                    <li>2024/03/23 - 優化響應式設計</li>
-                </ul>
-            </div>
-        `);
-        document.body.appendChild(infoModal);
-    }
+        <div class="about-content">
+            <h3>版本資訊</h3>
+            <p>當前版本：1.0.0</p>
+            <h3>作者資訊</h3>
+            <p>作者：LCM</p>
+            <h3>更新日誌</h3>
+            <ul id="changelog">
+                <li>2024/03/21 - 初始版本發布</li>
+                <li>2024/03/22 - 添加農曆日期功能</li>
+                <li>2024/03/23 - 優化響應式設計</li>
+            </ul>
+        </div>
+    `);
+    document.body.appendChild(infoModal);}
+
 };
 
 // 創建模態框的輔助函數
@@ -716,10 +949,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
     const icons = sidebar.getElementsByTagName('img');
     
-    // 為每個圖標添加點擊事件
+    // 為每���圖標添加點擊事件
     Array.from(icons).forEach((icon, index) => {
         icon.addEventListener('click', () => {
-            const functionName = ['home', 'tools', 'design', 'code', 'info'][index];
+            const functionName = ['home', 'tools', 'design', 'code', 'theme', 'background','info'][index];
             if (sidebarFunctions[functionName]) {
                 sidebarFunctions[functionName]();
             }
@@ -807,7 +1040,93 @@ const sidebarStyles = `
 const sidebarStyleSheet = document.createElement('style');
 sidebarStyleSheet.textContent = sidebarStyles;
 document.head.appendChild(sidebarStyleSheet);
-=======
 
-getLocation();
->>>>>>> da32161d7169fd3214e1eb2f7da417228defb02e
+// 添加錯誤處理
+window.addEventListener('error', (e) => {
+    if (e.target.tagName === 'IMG') {
+        // 圖片載入失敗時使用預設背景
+        console.error('背景圖片載入失敗:', e);
+        resetBackgroundSettings();
+    }
+});
+
+// 簡單的中文轉英文城市名稱對照（可以根據需要擴充）
+const cityNameMap = {
+    '台北': 'Taipei',
+    '高雄': 'Kaohsiung',
+    '台中': 'Taichung',
+    '台南': 'Tainan',
+    '基隆': 'Keelung',
+    '新北': 'New Taipei',
+    '桃園': 'Taoyuan',
+    '新竹': 'Hsinchu',
+    '嘉義': 'Chiayi',
+    '屏東': 'Pingtung',
+    '宜蘭': 'Yilan',
+    '花蓮': 'Hualien',
+    '台東': 'Taitung',
+    '澎湖': 'Penghu',
+    '金門': 'Kinmen',
+    '馬祖': 'Matsu',
+    // 可以添加更多城市對照
+};
+
+// 轉換城市名稱
+async function translateToEnglish(cityName) {
+    // 先檢查對照表
+    if (cityNameMap[cityName]) {
+        return cityNameMap[cityName];
+    }
+    
+    // 如果沒有對照，返回原始名稱
+    return cityName;
+}
+
+// 添加相關的 CSS 樣式
+const style = document.createElement('style');
+style.textContent = `
+    .loading {
+        position: relative;
+        pointer-events: none;
+    }
+
+    .loading::after {
+        content: '載入中...';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+    }
+
+    #background-url {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+    }
+
+    .file-upload-label {
+        display: inline-block;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .file-upload-label:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+`;
+
+document.head.appendChild(style);
